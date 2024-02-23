@@ -1,0 +1,246 @@
+﻿@page "/"
+@using ClassLibrary.Models;
+@using ClassLibrary.Data;
+@using System.Text.Json
+@using System.Text
+@using MongoDB.Bson
+
+
+<PageTitle>Index</PageTitle>
+
+
+<style>
+    .hej {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Kumbh Sans',sans-serif;
+		color: rgba(255,255,255,0.9);
+		-webkit-text-stroke: 0.5px white;
+    }
+
+    body {
+		background-image: url('https://images.unsplash.com/photo-1667776384514-a06f0b7675a1?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+        background-size: cover; /* Cover the entire page */
+        background-repeat: no-repeat; /* Do not repeat the image */
+        background-attachment: fixed; /* Optional: to keep the image fixed during scrolling */
+    }
+
+	p{
+
+	}
+
+</style>
+
+
+
+
+<div class="hej">
+	@foreach (var about in listAbout)
+	{
+		<h1 class="d-flex justify-content-center">
+			@about.Fullname
+		</h1>
+	}
+	<hr class="d-flex justify-content-center"/>
+
+	<div class="d-flex justify-content-center">
+		<img src="felixcvbild.png" style="width: 420px; height: 420px;" />
+	</div>
+	<hr class="d-flex justify-content-center" />
+
+	<div class="d-flex justify-content-center">
+		<h1>Utbildning</h1>
+	</div>
+
+	@foreach (var education in listEducation)
+	{
+		<h3 class="d-flex justify-content-center">
+			@education.Gymnasium
+		</h3>
+	}
+		
+	@foreach (var education in listEducation)
+	{
+		<h3 class="d-flex justify-content-center">
+			@education.OtherEducation
+		</h3>
+	}
+	<hr class="d-flex justify-content-center" />
+	<h1 class="d-flex justify-content-center">Skills</h1>
+
+	<div class="d-flex justify-content-center" style="display: flex; align-items: center; justify-content: center;">
+		<ul>
+			@foreach (var skill in listSkills)
+			{
+				<div class="d-flex flex-row" >
+					<h3 style="flex: 1;">@skill.Title</h3>
+					<progress style="flex: 1; width: 660px; text-align: center; margin-left: -215px; height: 50px " value="@skill.SkillLevel" min="0" max="100">@skill.SkillLevel</progress>
+				</div>
+			}
+		</ul>
+	</div>
+
+	<hr class="d-flex justify-content-center" />
+	<h1 class="d-flex justify-content-center">Om Mig</h1>
+	<div>
+		@foreach (var about in listAbout)
+		{
+			<h5 class="d-flex justify-content-center">@about.Description</h5>
+		}
+	</div>
+	
+	<hr class="d-flex justify-content-center" />
+	<h1 class="d-flex justify-content-center">Kontakt</h1>
+	
+	<div>
+		@foreach (var about in listAbout)
+		{
+			<h3 class="d-flex justify-content-center">✉   @about.Email </h3>
+		}
+		@foreach (var about in listAbout)
+		{
+			<h3 class="d-flex justify-content-center"> ☎   @about.Phonenumber </h3>
+		}
+		
+		<div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+			<div>
+				<h3 class="d-flex justify-content-center align-items-center" style="gap: 10px;">
+					<a href="https://www.linkedin.com/in/felix-magnusson-42036a1a3/" class="text-reset">
+						<img src="https://cdn2.iconfinder.com/data/icons/social-media-2285/512/1_Linkedin_unofficial_colored_svg-64.png" alt="LinkedIn Icon" style="width: 30px; height: 30px;" />
+					</a>
+				</h3>
+			</div>
+
+			<div>
+				<h3 class="d-flex justify-content-center align-items-center" style="gap: 10px;">
+					<a href="https://github.com/fedrull">
+						<img src="/group 2.png" alt="GitHub Icon" style="width: 30px; height: 30px;" />
+					</a>
+				</h3>
+			</div>
+		</div>
+
+
+		
+	</div>
+</div>
+
+<h3 class="hej d-flex justify-content-center" style="margin-top: 50px; margin-bottom: 30px;">Feel sad? 🠗</h3>
+
+<div class="d-flex justify-content-center">
+	<button style="margin-right: 50px;" class="btn btn-primary" @onclick="FetchData">Get a joke</button>
+
+	@if (todo != null)
+	{
+
+		<h6 class="hej">@todo.value</h6>
+
+	}
+</div>
+
+<AuthorizeView> 
+	<Authorize> 
+		<EditForm Context="stringkkkk" Model="@newskill" OnSubmit="PostSkill">
+			<div class="form-group">
+				<label for="exampleInputEmail1"></label>
+				<InputText @bind-Value="newskill.Title" class="form-control" id="exampleInputEmail1" placeholder="Add skill"/>
+			</div>
+			 <div class="form-group">
+				<label></label>
+				<InputNumber @bind-Value="newskill.SkillLevel" class="form-control" placeholder="Skill %"/>
+			</div>
+			<button style="margin-top: 15px;" type="submit" class="btn btn-primary">Submit</button>
+		</EditForm>
+	</Authorize>
+</AuthorizeView>
+
+
+<div class="hej">
+	<hr class="d-flex justify-content-center" />
+</div>
+
+<div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+	<AuthorizeView>
+		<form method="post" action="Identity/Account/Logout" style="margin: 0;">
+			<button type="submit" class="nav-link btn btn-danger" style="color: white;">Log out</button>
+		</form>
+	</AuthorizeView>
+	<a href="Identity/Account/Register" class="btn btn-primary">Register</a>
+	<a href="Identity/Account/Login" class="btn btn-primary">Log in</a>
+</div>
+
+
+<div class="hej">
+	<hr class="d-flex justify-content-center" />
+</div>
+
+<div class="hej">
+<div class="container-fluid text-center p-4" style="background-color: rgb(0, 0, 0, 0.2);">
+	© 2024 Copyright:
+	<a class="text-reset fw-bold" href="https://www.ithsdistans.se/login/index.php">ItHs.se</a>
+</div>
+</div>
+
+
+@code{
+	private List<About> listAbout { get; set; } = new List<About>();
+	private List<Education> listEducation { get; set; } = new List<Education>();
+	private List<Skills> listSkills { get; set; } = new List<Skills>();
+	private Skills newskill = new Skills();
+	
+
+
+	private HttpClient httpAboutClient = new HttpClient();
+	private HttpClient httpEducationClient = new HttpClient();
+	private HttpClient httpSkillsClient = new HttpClient();
+	private HttpClient addSkillClient = new HttpClient();
+	private HttpClient jokeClient = new HttpClient();
+	 
+
+	protected override async Task OnInitializedAsync()
+	{
+		listAbout = await httpAboutClient.GetFromJsonAsync<List<About>>("https://cvapifm.azurewebsites.net/about");
+		listEducation = await httpEducationClient.GetFromJsonAsync<List<Education>>("https://cvapifm.azurewebsites.net/education");
+		listSkills = await httpSkillsClient.GetFromJsonAsync<List<Skills>>("https://cvapifm.azurewebsites.net/skills");
+	}
+
+
+	public async Task PostSkill()
+	{
+		Console.WriteLine(newskill.Title);
+		var jsonContent = JsonSerializer.Serialize(newskill);
+		var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+		var response = await addSkillClient.PostAsync("https://cvapifm.azurewebsites.net/skills", content);
+
+		if (response.IsSuccessStatusCode)
+		{
+			listSkills = await addSkillClient.GetFromJsonAsync<List<Skills>>("https://cvapifm.azurewebsites.net/skills");
+		}
+		else
+		{
+
+		}
+	}
+
+	public class Todo
+	{
+		public string value { get; set; }
+	}
+
+	public Todo todo;
+
+	public async Task FetchData()
+	{
+		todo = await jokeClient.GetFromJsonAsync<Todo>("https://api.chucknorris.io/jokes/random");
+	}
+
+	private void Submit(Skills skills)
+	{
+		
+	}
+
+	
+	
+}
